@@ -4,28 +4,19 @@ import { Link } from "react-router-dom";
 export default function ProductCard({ product }) {
   return (
     <Link
-      to={`/user/product/${product.id}`}
-      style={{ textDecoration: "none", color: "inherit" }}
+      to={`/user/product/${product._id}`}
+      className="no-underline text-inherit"
     >
-      <div
-        style={{
-          borderRadius: "10px",
-          border: "1px solid #ddd",
-          padding: "15px",
-          margin: "10px",
-          width: "200px",
-          background: "#f9f9f9",
-          cursor: "pointer",
-          transition: "0.3s",
-        }}
-      >
+      <div className="rounded-lg border border-gray-300 p-4 h-80 bg-gray-100 cursor-pointer hover:shadow-lg transition duration-300 flex flex-col justify-between">
         <img
-          src={product.image}
+          src={`http://localhost:5000/uploads/${product.image}`}
           alt={product.name}
-          style={{ width: "100%", borderRadius: "10px" }}
+          className="w-full h-40 object-cover rounded-lg"
         />
-        <h3 style={{ margin: "10px 0" }}>{product.name}</h3>
-        <p style={{ color: "#555" }}>₱{product.price}</p>
+        <div className="mt-2 flex flex-col justify-between flex-1">
+          <h3 className="text-lg font-semibold">{product.name}</h3>
+          <p className="text-gray-600 font-medium mt-2">₱{product.price}</p>
+        </div>
       </div>
     </Link>
   );

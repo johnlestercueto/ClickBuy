@@ -1,97 +1,59 @@
-import React from "react";
+// src/pages/user/ProductDetails.jsx
+import React, { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import UserLayout from "../../layouts/UserLayout";
 import BackButton from "../../components/user/BackButton";
-
-// static products data muna
-const products = [
-  {
-    id: 1,
-    name: "Nike Shoes",
-    price: 2500,
-    image: "https://via.placeholder.com/250",
-    description: "Comfortable running shoes for everyday use.",
-  },
-  {
-    id: 2,
-    name: "Adidas Hoodie",
-    price: 1800,
-    image: "https://via.placeholder.com/250",
-    description: "Warm and stylish hoodie for casual wear.",
-  },
-  {
-    id: 3,
-    name: "Apple Watch",
-    price: 12000,
-    image: "https://via.placeholder.com/250",
-    description: "Smartwatch with fitness tracking and notifications.",
-  },
-];
+import useProductStore from "../../features/product/productStore";
 
 export default function ProductDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const product = products.find((p) => p.id === parseInt(id));
+  const { products, fetchProducts, loading, error } = useProductStore();
 
-  if (!product) {
-    return <h2 style={{ padding: "20px" }}>Product not found</h2>;
-  }
+  useEffect(() => {
+    if (products.length === 0) {
+      fetchProducts();
+    }
+  }, []);
+
+  const product = products.find((p) => p._id === id);
+
+  if (loading) return <h2 className="p-6">Loading product...</h2>;
+  if (error) return <h2 className="p-6 text-red-500">Error: {error}</h2>;
+  if (!product) return <h2 className="p-6">Product not found</h2>;
+
+  const backendUrl = "http://localhost:5000"; // palitan kung iba ang port
 
   return (
     <UserLayout>
-      <div style={{ padding: "20px" }}>
+      <div className="p-6">
         <BackButton />
 
-        {/* Product Layout */}
-        <div
-          style={{
-            display: "flex",
-            gap: "20px",
-            background: "#fff",
-            padding: "20px",
-            borderRadius: "12px",
-            boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
-          }}
-        >
+        <div className="flex flex-col md:flex-row gap-6 bg-white p-6 rounded-xl shadow-md">
           {/* Left: Image */}
-          <div style={{ flex: 1 }}>
+          <div className="md:flex-1">
             <img
-              src={product.image}
+              src={`${backendUrl}/uploads/${product.image}`}
               alt={product.name}
-              style={{ width: "100%", borderRadius: "10px" }}
+              className="w-full h-auto rounded-lg object-cover"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = "https://via.placeholder.com/250?text=No+Image";
+              }}
             />
           </div>
 
           {/* Right: Details */}
-          <div style={{ flex: 2, display: "flex", flexDirection: "column" }}>
-            <h2>{product.name}</h2>
-            <p style={{ fontSize: "18px", color: "#555" }}>₱{product.price}</p>
-            <p style={{ marginTop: "10px" }}>{product.description}</p>
+          <div className="md:flex-2 flex flex-col">
+            <h2 className="text-2xl font-semibold">{product.name}</h2>
+            <p className="text-xl text-gray-700 mt-2">₱{product.price}</p>
+            <p className="mt-4 text-gray-600">{product.description}</p>
 
-            {/* Buttons */}
-            <div style={{ marginTop: "auto", display: "flex", gap: "10px" }}>
-              <button
-                style={{
-                  background: "#333",
-                  color: "white",
-                  border: "none",
-                  padding: "10px 15px",
-                  borderRadius: "8px",
-                  cursor: "pointer",
-                }}
-              >
+            <div className="mt-auto flex gap-4">
+              <button className="mt-6 px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition">
                 Add to Cart
               </button>
-              <button
-                style={{
-                  background: "gray",
-                  color: "white",
-                  border: "none",
-                  padding: "10px 15px",
-                  borderRadius: "8px",
-                  cursor: "pointer",
-                }}
-              >
+              <button className="mt-6 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition">
                 Checkout
               </button>
             </div>

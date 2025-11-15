@@ -1,34 +1,32 @@
-import React from "react";
+// Home.jsx
+import React, { useEffect } from "react";
 import UserLayout from "../../layouts/UserLayout";
 import ProductCard from "../../components/user/ProductCard";
-
-const products = [
-  {
-    id: 1,
-    name: "Nike Shoes",
-    price: 2500,
-    image: "https://via.placeholder.com/200",
-  },
-  {
-    id: 2,
-    name: "Adidas Hoodie",
-    price: 1500,
-    image: "https://via.placeholder.com/200",
-  },
-  {
-    id: 3,
-    name: "Puma Cap",
-    price: 500,
-    image: "https://via.placeholder.com/200",
-  },
-];
+import useProductStore from "../../features/product/productStore";
 
 export default function Home() {
+  const { products, loading, error, fetchProducts } = useProductStore();
+
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
+
   return (
     <UserLayout>
-      <div style={{ display: "flex", flexWrap: "wrap" }}>
+      {/* LOADING */}
+      {loading && <p className="text-center mt-3">Loading products...</p>}
+
+      {/* ERROR */}
+      {error && <p className="text-red-500 text-center mt-3">{error}</p>}
+
+      {/* PRODUCTS GRID */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-1 mt-3">
+        {products.length === 0 && !loading && (
+          <p className="col-span-full text-center">No products available.</p>
+        )}
+
         {products.map((p) => (
-          <ProductCard key={p.id} product={p} />
+          <ProductCard key={p._id} product={p} />
         ))}
       </div>
     </UserLayout>

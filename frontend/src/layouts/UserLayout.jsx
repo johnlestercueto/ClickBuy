@@ -15,7 +15,6 @@ export default function UserLayout({ children }) {
     <div style={layoutStyle}>
       <Header />
       <main style={{ flex: 1, padding: "20px" }}>{children}</main>
-      <Footer />
     </div>
   );
 }
