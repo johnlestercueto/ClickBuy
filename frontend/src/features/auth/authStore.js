@@ -12,8 +12,11 @@ export const useAuthStore = create((set) => ({
         try {
             const data = await login(credential)
             set({ user: data.user, loading: false})
+            return data.user;
         } catch (error) {
-            set({ error: error.response?.data?.message || "Login failed", loading: false });
+             const errMsg = error.response?.data?.message || "Login failed";
+              set({ error: errMsg, loading: false });
+             throw new Error(errMsg); // <-- important for component to catch
         }
     },
 
@@ -24,8 +27,11 @@ export const useAuthStore = create((set) => ({
             const data = await register(userdata)
             
             set({ user: data.user, loading: false})
+            return data.user;
         } catch (error) {
-            set({ error: error.response?.data?.message || "Registration failed", loading: false });
+            const errMsg = error.response?.data?.message || "Registration failed";
+    set({ error: errMsg, loading: false });
+    throw new Error(errMsg); // <-- throw so component can catch
         }
     },
 

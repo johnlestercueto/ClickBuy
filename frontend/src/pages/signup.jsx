@@ -1,17 +1,31 @@
-// src/SignUpPage.jsx
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuthStore } from "../features/auth/authStore";
 
 export default function SignUpPage() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [message, setMessage] = useState(null);
 
-  const handleSignUp = (e) => {
+  const { registerUser, loading, error } = useAuthStore();
+  const navigate = useNavigate();
+
+  const handleSignUp = async (e) => {
     e.preventDefault();
-    console.log("Signing up with:", username, email, password);
-    // dito ilalagay ang API call o signup logic
+    setMessage(null);
+    try {
+      const user = await registerUser({ username, email, password });
+      if (user) {
+        setMessage("Registration successful! Redirecting to login...");
+        setTimeout(() => {
+          navigate("/login");
+        }, 1500);
+      }
+    } catch (err) {
+      setMessage(err.message);
+    }
   };
 
   return (
@@ -20,6 +34,18 @@ export default function SignUpPage() {
         <h2 className="text-2xl font-semibold text-gray-800 text-center mb-6">
           Sign Up
         </h2>
+
+        {/* Display backend messages ABOVE the form */}
+        {message && (
+          <p
+            className={`text-sm text-center mb-4 ${
+              error ? "text-red-500" : "text-green-500"
+            }`}
+          >
+            {message}
+          </p>
+        )}
+
         <form onSubmit={handleSignUp} className="flex flex-col gap-4">
           <input
             type="text"
@@ -57,8 +83,9 @@ export default function SignUpPage() {
           <button
             type="submit"
             className="bg-green-200 text-gray-800 font-semibold py-2 rounded hover:bg-green-300 transition"
+            disabled={loading}
           >
-            Sign Up
+            {loading ? "Signing up..." : "Sign Up"}
           </button>
         </form>
 

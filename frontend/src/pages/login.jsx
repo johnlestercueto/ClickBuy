@@ -1,15 +1,37 @@
-// src/LoginPage.jsx
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuthStore } from "../features/auth/authStore";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [message, setMessage] = useState(null);
 
-  const handleLogin = (e) => {
+  const loginUser = useAuthStore((state) => state.loginUser);
+  const navigate = useNavigate();
+
+  const handleLogin = async (e) => {
     e.preventDefault();
-    console.log("Logging in with:", email, password);
+    setMessage(null);
+
+    try {
+      const loggedInUser = await loginUser({ email, password });
+
+      if (!loggedInUser) return;
+
+      // redirect based on role
+      if (loggedInUser.role === "admin") {
+        navigate("/admin");
+      } else if (loggedInUser.role === "user") {
+        navigate("/user");
+      }
+    } catch (err) {
+      setMessage(err.message || "Login failed");
+
+      // auto-hide after 3 seconds
+      setTimeout(() => setMessage(null), 3000);
+    }
   };
 
   return (
@@ -18,6 +40,12 @@ export default function LoginPage() {
         <h2 className="text-2xl font-semibold text-gray-800 text-center mb-6">
           Login
         </h2>
+
+        {/* Display error message ABOVE the form */}
+        {message && (
+          <p className="text-red-500 text-sm text-center mb-4">{message}</p>
+        )}
+
         <form onSubmit={handleLogin} className="flex flex-col gap-4">
           <input
             type="email"
@@ -51,19 +79,6 @@ export default function LoginPage() {
             Login
           </button>
         </form>
-
-        {/* Google Login Button */}
-        <button
-          type="button"
-          className="mt-4 w-full flex items-center justify-center gap-2 border border-gray-300 rounded py-2 hover:bg-gray-100 transition"
-        >
-          <img
-            src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/512px-Google_%22G%22_Logo.svg.png"
-            alt="Google"
-            className="w-5 h-5"
-          />
-          Login with Google
-        </button>
 
         <p className="text-sm text-gray-500 mt-4 text-center">
           Don't have an account?{" "}

@@ -10,7 +10,7 @@ const bcrypt = require('bcrypt')
  * Ginagamit kapag magrerehistro ang bagong user
  * Tatanggap siya ng object na may {username, email, password}
  */
-const register = async ({username, email, password}) => {
+const register = async ({username, email, password, role}) => {
 
     // 1. Validation: check kung may kulang sa fields
     if (!username || !email || !password) {
@@ -29,7 +29,8 @@ const register = async ({username, email, password}) => {
     const user = new User({
         username,
         email,
-        password: hashedPassword
+        password: hashedPassword,
+        role: role || 'user'
     });
 
     // 5. I-save ang user sa database
